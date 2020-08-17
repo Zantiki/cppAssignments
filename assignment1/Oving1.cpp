@@ -18,7 +18,7 @@ void read_temperatures(double temps[], int length){
 
     if (!data_file) {
         cout << "Error on reading file." << endl;
-        
+
     }
     double number;
     while (data_file >> number) {
