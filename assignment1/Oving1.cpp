@@ -9,7 +9,7 @@
 using namespace std;
 
 void read_temperatures(double temps[], int length){
-    const char filename[] = "/home/sebastian/CLionProjects/cppAssignments/assignment1/temps.dat";
+    const char filename[] = "temps.dat";
     ifstream data_file;
     data_file.open(filename);
 
@@ -17,7 +17,9 @@ void read_temperatures(double temps[], int length){
     int i = 0;
 
     if (!data_file) {
-        cout << "Error on reading file." << endl;
+        cout << "Error on reading file at " << filename << endl;
+        cout << "Please verify that the file exists" << endl;
+        exit(1);
 
     }
     double number;
@@ -36,6 +38,7 @@ int main(){
     double temps[period_length];
     int input_count = 0;
     char mode;
+    cout << "--- TEMP-READER ---\n" << endl;
     cout << "Read data from file? y/n ";
     cin >> mode;
 
@@ -43,9 +46,9 @@ int main(){
         read_temperatures(temps, period_length);
     }else{
         while(input_count < period_length){
-            int cur_temp = 0;
+            double cur_temp = 0;
             cout << "Write temp nr " << input_count+1 << ": ";
-            cin >> cur_temp;
+            cin >> cur_temp ;
             temps[input_count] = cur_temp;
             input_count++;
         }
