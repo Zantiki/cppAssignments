@@ -28,3 +28,17 @@ double Circle::get_circumference() const {
     double circumference = 2.0 * pi * radius;
     return circumference;
 }
+
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    Circle circle = Circle(5);
+
+    double area = circle.get_area();
+    cout << "Arealet er lik " << area << endl;
+
+    double circumference = circle.get_circumference();
+    cout << "Omkretsen er lik " << circumference << endl;
+}
