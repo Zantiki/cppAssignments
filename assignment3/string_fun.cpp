@@ -3,15 +3,8 @@
 // Created by sebastian on 27.08.2020.
 //
 
-/*
-e) Bytt ut tegn nr 10-12 i sentence2 med x’er. Tegnene nummereres fra og med 0. Husk å kontrollere at dette er gyldige posisjoner! Skriv ut sentence og sentence2.
-f) Lagre de fem første tegnene i sentence i objektet sentence_start. Skriv ut sentence og sentence_start. (Husk kontroll av gyldige posisjoner)
-g) Finn ut om sentence inneholder ordet "hallo". Skriv ut resultatet.
-h) Finn alle forekomster i sentence av strengen "er". Skriv ut resultatet.
-*/
 #include <iostream>
 #include <string>
-#include <sstream>
 
 using namespace std;
 
@@ -33,7 +26,6 @@ int main(){
     cout << "sentence: " << sentence.length() << endl;
     string sentence2 = sentence;
 
-    string *sentence_pointer = &sentence2;
 
     if (sentence.length() < 13){
         cout << "sentence too short for changing char 10-12" << endl;
@@ -63,7 +55,6 @@ int main(){
     }
 
     int sub_str_reference = sentence.find("er");
-    int sentence_length = sentence.length();
     int found_instances = 0;
 
     while(sub_str_reference > -1){
