@@ -11,6 +11,7 @@ add_executable(Oving4 assignment4/Oving4.cpp)
 add_executable(Circle assignment3/circle.cpp)
 add_executable(Commodity assignment3/commodity_main.cpp)
 add_executable(string_fun assignment3/string_fun.cpp)
+add_executable(Oving5 assignment5/chess.cpp)
 INCLUDE(FindPkgConfig)
 
 if(APPLE)
