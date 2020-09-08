@@ -11,6 +11,35 @@ using namespace std;
 
 class ChessBoard {
 public:
+    string to_string() {
+        string graphical_board = "\n---------------------------------";
+
+        for(unsigned long y = 0; y < squares.size(); y++){
+            string y_str = "\n|";
+
+            for(unsigned long x = 0; x < squares[y].size(); x++){
+                auto& cell = squares[y][x];
+                if(cell){
+                    if(cell->type() == "white King"){
+                        y_str += "wK |";
+                    }else if(cell->type() == "white Knight"){
+                        y_str += "wKn|";
+                    }else if(cell->type() == "black King") {
+                        y_str += "bK |";
+                    }else if(cell->type() == "black Knight") {
+                        y_str += "bKn|";
+                    }
+                }else{
+                    y_str += "   |";
+                }
+            }
+            y_str += "\n---------------------------------";
+            graphical_board += y_str;
+        }
+        graphical_board += "\n";
+        return graphical_board;
+    };
+
     enum class Color { WHITE,
         BLACK };
 
@@ -36,10 +65,58 @@ public:
 
     class King : public Piece {
         // missing implementations
+
+
+        bool valid_move(int from_x, int from_y, int to_x, int to_y) const override{
+            //Piece::valid_move(from_x, from_y, to_x, to_y);
+            int diff_x = to_x - from_x;
+            int diff_y = to_y - from_y;
+
+            if(diff_x*diff_x == 1 && diff_y == 0){
+                return true;
+            }
+            if(diff_y*diff_y == 1 && diff_x == 0){
+                return true;
+            }
+            if(diff_x*diff_y == 1){
+                return true;
+            }
+            return false;
+
+
+        }
+
+        std::string type() const{
+            return this->color_string()+" King";
+        }
+
+    public:
+        explicit King(ChessBoard::Color color_) : Piece(color_){}
     };
 
     class Knight : public Piece {
-        // missing implementations
+
+        bool valid_move(int from_x, int from_y, int to_x, int to_y) const override{
+            //Piece::valid_move(from_x, from_y, to_x, to_y);
+            int diff_x = to_x-from_x;
+            int diff_y = to_y-from_y;
+
+            if(diff_x*diff_x == 1 && diff_y*diff_y == 4  ) {
+                return true;
+            }
+            if (diff_x*diff_x == 4 && diff_y*diff_y == 1 ){
+                return true;
+            }
+            return false;
+        }
+
+        std::string type() const override{
+            return this->color_string()+" Knight";
+        }
+
+    public:
+// missing implementations
+explicit Knight(ChessBoard::Color color) : Piece(color){}
     };
 
     ChessBoard() {
@@ -73,17 +150,21 @@ public:
                     } else {
                         // piece in the from square has the same color as the piece in the to square
                         cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
+                        cout << this->to_string() << endl;
                         return false;
                     }
                 }
                 piece_to = move(piece_from);
+                cout << this->to_string() << endl;
                 return true;
             } else {
                 cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
+                cout << this->to_string() << endl;
                 return false;
             }
         } else {
             cout << "no piece at " << from << endl;
+            cout << this->to_string() << endl;
             return false;
         }
     }
@@ -116,4 +197,5 @@ int main() {
     board.move_piece("d5", "f6");
     board.move_piece("h6", "g8");
     board.move_piece("f6", "e8");
+
 }
