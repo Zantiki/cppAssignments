@@ -20,15 +20,7 @@ public:
             for(unsigned long x = 0; x < squares[y].size(); x++){
                 auto& cell = squares[y][x];
                 if(cell){
-                    if(cell->type() == "white King"){
-                        y_str += "wK |";
-                    }else if(cell->type() == "white Knight"){
-                        y_str += "wKn|";
-                    }else if(cell->type() == "black King") {
-                        y_str += "bK |";
-                    }else if(cell->type() == "black Knight") {
-                        y_str += "bKn|";
-                    }
+                    y_str += cell->short_type() + "|";
                 }else{
                     y_str += "   |";
                 }
@@ -58,6 +50,8 @@ public:
 
         /// Return color and type of the chess piece
         virtual std::string type() const = 0;
+
+        virtual std::string short_type() const = 0;
 
         /// Returns true if the given chess piece move is valid
         virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const = 0;
@@ -90,6 +84,11 @@ public:
             return this->color_string()+" King";
         }
 
+        string short_type() const{
+            string color = this->color_string();
+            return string(1,color[0]) +"K ";
+        }
+
     public:
         explicit King(ChessBoard::Color color_) : Piece(color_){}
     };
@@ -108,6 +107,11 @@ public:
                 return true;
             }
             return false;
+        }
+
+        string short_type() const{
+            string color = this->color_string();
+            return string(1,color[0]) +"Kn";
         }
 
         std::string type() const override{
