@@ -8,7 +8,7 @@
 using namespace std;
 using namespace boost::asio::ip;
 
-class EchoServer {
+class HttpServer {
 private:
     class Connection {
     public:
@@ -37,16 +37,26 @@ private:
                                  // Close connection when "exit" is retrieved from client
                                  string message_from_server = "HTTP/1.0 404 Not Found ";
 
-                                 if (message_from_client == "GET / HTTP/1.1"){
+                                 if (message_from_client == "GET / HTTP/1.1") {
                                      message_from_server = "HTTP/1.0 200 OK \n"
-                                                                  "Content-Type: text/html; charset=utf-8 \n"
-                                                                  "\n"
-                                                                  "<HTML><BODY>\n"
-                                                                  "<H1> Dette er hovedsiden </h1>\n"
-                                                                  "</UL>\n"
-                                                                  "</BODY></HTML>";
-                                 }else if(message_from_client == " br"){
-                                     return;
+                                                           "Content-Type: text/html; charset=utf-8 \n"
+                                                           "\n"
+                                                           "<HTML><BODY>\n"
+                                                           "<H1> Dette er hovedsiden </h1>\n"
+                                                           "</UL>\n"
+                                                           "</BODY></HTML>";
+
+                                 }else if (message_from_client == "GET /en_side HTTP/1.1"){
+                                     message_from_server = "HTTP/1.0 200 OK \n"
+                                                           "Content-Type: text/html; charset=utf-8 \n"
+                                                           "\n"
+                                                           "<HTML><BODY>\n"
+                                                           "<H1> Dette er en side </h1>\n"
+                                                           "</UL>\n"
+                                                           "</BODY></HTML>";
+
+                                 }else{
+                                     message_from_server = "HTTP/1.0 404 Not Found ";
                                  }
 
 
@@ -63,8 +73,12 @@ private:
                                  async_write(connection->socket, *write_buffer,
                                              [this, connection, write_buffer](const boost::system::error_code &ec, size_t) {
                                                  // If not error:
-                                                 if (!ec)
+                                                 if (!ec){
                                                      handle_request(connection);
+                                                 }
+                                                // Ensure connection is closed after message is sent
+                                                connection->socket.close();
+
                                              });
                              }
                          });
@@ -88,7 +102,7 @@ private:
     }
 
 public:
-    EchoServer() : endpoint(tcp::v4(), 8080), acceptor(io_service, endpoint) {}
+    HttpServer() : endpoint(tcp::v4(), 8080), acceptor(io_service, endpoint) {}
 
     void start() {
         accept();
@@ -98,10 +112,9 @@ public:
 };
 
 int main() {
-    EchoServer echo_server;
+    HttpServer http_server;
 
-    cout << "Starting echo server" << endl
-         << "Connect in a terminal with: telnet localhost 8080. Type 'exit' to end connection." << endl;
-
-    echo_server.start();
+    cout << "Starting basic http-server" << endl
+         << "Connect via localhost:8080" << endl;
+    http_server.start();
 }
