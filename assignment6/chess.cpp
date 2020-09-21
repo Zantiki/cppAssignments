@@ -6,12 +6,13 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 using namespace std;
 
 class ChessBoard {
 public:
-    string to_string() {
+    /*string to_string() {
         string graphical_board = "\n---------------------------------";
 
         for(unsigned long y = 0; y < squares.size(); y++){
@@ -30,8 +31,7 @@ public:
         }
         graphical_board += "\n";
         return graphical_board;
-    };
-
+    };*/
     enum class Color { WHITE,
         BLACK };
 
@@ -56,6 +56,10 @@ public:
         /// Returns true if the given chess piece move is valid
         virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const = 0;
     };
+    function<void(vector<vector<unique_ptr<Piece>>>)> print;
+    function<void(const std::string &from, const std::string &to,
+            vector<vector<unique_ptr<ChessBoard::Piece>>>,
+                    function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)>)> move_piece_grapics;
 
     class King : public Piece {
         // missing implementations
@@ -142,36 +146,96 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
         int to_y = stoi(string() + to[1]) - 1;
 
         auto &piece_from = squares[from_x][from_y];
+        this->move_piece_grapics(from, to, squares, this->print_board);
         if (piece_from) {
             if (piece_from->valid_move(from_x, from_y, to_x, to_y)) {
-                cout << piece_from->type() << " is moving from " << from << " to " << to << endl;
                 auto &piece_to = squares[to_x][to_y];
                 if (piece_to) {
-                    if (piece_from->color != piece_to->color) {
-                        cout << piece_to->type() << " is being removed from " << to << endl;
-                        if (auto king = dynamic_cast<King *>(piece_to.get()))
-                            cout << king->color_string() << " lost the game" << endl;
-                    } else {
-                        // piece in the from square has the same color as the piece in the to square
-                        cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
-                        cout << this->to_string() << endl;
+                    if (piece_from->color == piece_to->color)  {
                         return false;
                     }
                 }
                 piece_to = move(piece_from);
-                cout << this->to_string() << endl;
                 return true;
             } else {
-                cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
-                cout << this->to_string() << endl;
                 return false;
             }
         } else {
-            cout << "no piece at " << from << endl;
-            cout << this->to_string() << endl;
             return false;
         }
     }
+};
+
+class ChessBoardPrint{
+public:
+    ChessBoard board;
+    ChessBoardPrint(ChessBoard _board){
+        this->board = _board;
+        //vector<vector<unique_ptr<ChessBoard::Piece>>> squares = board.squares;
+        function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)> print_board = [](vector<vector<unique_ptr<ChessBoard::Piece>>> squares) {
+                string graphical_board = "\n---------------------------------";
+
+                for(unsigned long y = 0; y < squares.size(); y++){
+                    string y_str = "\n|";
+
+                    for(unsigned long x = 0; x < squares[y].size(); x++){
+                        auto& cell = squares[y][x];
+                        if(cell){
+                            y_str += cell->short_type() + "|";
+                        }else{
+                            y_str += "   |";
+                        }
+                    }
+                    y_str += "\n---------------------------------";
+                    graphical_board += y_str;
+                }
+                graphical_board += "\n";
+                cout << graphical_board << endl;
+                /*return graphical_board; */
+        };
+
+        board.move_piece_grapics = [](const std::string &from, const std::string &to, vector<vector<unique_ptr<ChessBoard::Piece>>> squares,
+                function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)>print_board){
+            int from_x = from[0] - 'a';
+            int from_y = stoi(string() + from[1]) - 1;
+            int to_x = to[0] - 'a';
+            int to_y = stoi(string() + to[1]) - 1;
+
+            auto &piece_from = squares[from_x][from_y];
+            if (piece_from) {
+                if (piece_from->valid_move(from_x, from_y, to_x, to_y)) {
+                    cout << piece_from->type() << " is moving from " << from << " to " << to << endl;
+                    auto &piece_to = squares[to_x][to_y];
+                    if (piece_to) {
+                        if (piece_from->color != piece_to->color) {
+                            cout << piece_to->type() << " is being removed from " << to << endl;
+                            if (auto king = dynamic_cast<ChessBoard::King *>(piece_to.get()))
+                                cout << king->color_string() << " lost the game" << endl;
+                        } else {
+                            // piece in the from square has the same color as the piece in the to square
+                            cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
+                            print_board(squares);
+                            return;
+                        }
+                    }
+                    piece_to = move(piece_from);
+                    print_board(squares);
+                    return;
+                } else {
+                    cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
+                    print_board(squares);
+                    return;
+                }
+            } else {
+                cout << "no piece at " << from << endl;
+                print_board(squares);
+                return;
+            }
+        };
+
+
+    };
+
 };
 
 int main() {
