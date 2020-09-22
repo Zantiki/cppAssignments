@@ -12,26 +12,6 @@ using namespace std;
 
 class ChessBoard {
 public:
-    /*string to_string() {
-        string graphical_board = "\n---------------------------------";
-
-        for(unsigned long y = 0; y < squares.size(); y++){
-            string y_str = "\n|";
-
-            for(unsigned long x = 0; x < squares[y].size(); x++){
-                auto& cell = squares[y][x];
-                if(cell){
-                    y_str += cell->short_type() + "|";
-                }else{
-                    y_str += "   |";
-                }
-            }
-            y_str += "\n---------------------------------";
-            graphical_board += y_str;
-        }
-        graphical_board += "\n";
-        return graphical_board;
-    };*/
     enum class Color { WHITE,
         BLACK };
 
@@ -56,10 +36,6 @@ public:
         /// Returns true if the given chess piece move is valid
         virtual bool valid_move(int from_x, int from_y, int to_x, int to_y) const = 0;
     };
-    function<void(vector<vector<unique_ptr<Piece>>>)> print;
-    function<void(const std::string &from, const std::string &to,
-            vector<vector<unique_ptr<ChessBoard::Piece>>>,
-                    function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)>)> move_piece_grapics;
 
     class King : public Piece {
         // missing implementations
@@ -135,7 +111,8 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
     }
 
     /// 8x8 squares occupied by 1 or 0 chess pieces
-    vector<vector<unique_ptr<Piece>>> squares;
+    vector<vector<shared_ptr<Piece>>> squares;
+    function<void(const std::string, std::string, vector<vector<shared_ptr<Piece>>>)> on_move;
 
     /// Move a chess piece if it is a valid move.
     /// Does not test for check or checkmate.
@@ -146,7 +123,7 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
         int to_y = stoi(string() + to[1]) - 1;
 
         auto &piece_from = squares[from_x][from_y];
-        this->move_piece_grapics(from, to, squares, this->print_board);
+        on_move(from, to, squares);
         if (piece_from) {
             if (piece_from->valid_move(from_x, from_y, to_x, to_y)) {
                 auto &piece_to = squares[to_x][to_y];
@@ -168,39 +145,38 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
 
 class ChessBoardPrint{
 public:
-    ChessBoard board;
-    ChessBoardPrint(ChessBoard _board){
+
+    ChessBoard *board;
+
+    ChessBoardPrint(ChessBoard *_board){
         this->board = _board;
-        //vector<vector<unique_ptr<ChessBoard::Piece>>> squares = board.squares;
-        function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)> print_board = [](vector<vector<unique_ptr<ChessBoard::Piece>>> squares) {
-                string graphical_board = "\n---------------------------------";
 
-                for(unsigned long y = 0; y < squares.size(); y++){
-                    string y_str = "\n|";
+        function<void(vector<vector<shared_ptr<ChessBoard::Piece>>>)> print = []( auto squares ){
+            string graphical_board = "\n---------------------------------";
+            for(unsigned long y = 0; y < squares.size(); y++){
+                string y_str = "\n|";
 
-                    for(unsigned long x = 0; x < squares[y].size(); x++){
-                        auto& cell = squares[y][x];
-                        if(cell){
-                            y_str += cell->short_type() + "|";
-                        }else{
-                            y_str += "   |";
-                        }
+                for(unsigned long x = 0; x < squares[y].size(); x++){
+                    auto& cell = squares[y][x];
+                    if(cell){
+                        y_str += cell->short_type() + "|";
+                    }else{
+                        y_str += "   |";
                     }
-                    y_str += "\n---------------------------------";
-                    graphical_board += y_str;
                 }
-                graphical_board += "\n";
-                cout << graphical_board << endl;
-                /*return graphical_board; */
+                y_str += "\n---------------------------------";
+                graphical_board += y_str;
+            }
+            graphical_board += "\n";
+            cout << graphical_board << endl;
         };
 
-        board.move_piece_grapics = [](const std::string &from, const std::string &to, vector<vector<unique_ptr<ChessBoard::Piece>>> squares,
-                function<void(vector<vector<unique_ptr<ChessBoard::Piece>>>)>print_board){
+        function<void(const std::string, const std::string, vector<vector<shared_ptr<ChessBoard::Piece>>>)>
+                move_piece_graphics = [](const std::string &from, const std::string &to, auto squares ){
             int from_x = from[0] - 'a';
             int from_y = stoi(string() + from[1]) - 1;
             int to_x = to[0] - 'a';
             int to_y = stoi(string() + to[1]) - 1;
-
             auto &piece_from = squares[from_x][from_y];
             if (piece_from) {
                 if (piece_from->valid_move(from_x, from_y, to_x, to_y)) {
@@ -214,23 +190,24 @@ public:
                         } else {
                             // piece in the from square has the same color as the piece in the to square
                             cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
-                            print_board(squares);
                             return;
                         }
                     }
-                    piece_to = move(piece_from);
-                    print_board(squares);
                     return;
                 } else {
                     cout << "can not move " << piece_from->type() << " from " << from << " to " << to << endl;
-                    print_board(squares);
                     return;
                 }
             } else {
                 cout << "no piece at " << from << endl;
-                print_board(squares);
                 return;
             }
+            cout << "Should have printed" << endl;
+        };
+       _board->on_move = [&print, &move_piece_graphics](const std::string &from, const std::string &to, auto squares ){
+           cout << "Called" << endl;
+           print(squares);
+           //move_piece_graphics(from, to, squares);
         };
 
 
@@ -241,13 +218,18 @@ public:
 int main() {
     ChessBoard board;
 
-    board.squares[4][0] = make_unique<ChessBoard::King>(ChessBoard::Color::WHITE);
-    board.squares[1][0] = make_unique<ChessBoard::Knight>(ChessBoard::Color::WHITE);
-    board.squares[6][0] = make_unique<ChessBoard::Knight>(ChessBoard::Color::WHITE);
+    // Todo: segfault at function calls in on_move;
+    ChessBoardPrint printer(&board);
+    //vector<vector<shared_ptr<ChessBoard::Piece>>> squares;
+    //board.on_move("e3", "e2", squares);
 
-    board.squares[4][7] = make_unique<ChessBoard::King>(ChessBoard::Color::BLACK);
-    board.squares[1][7] = make_unique<ChessBoard::Knight>(ChessBoard::Color::BLACK);
-    board.squares[6][7] = make_unique<ChessBoard::Knight>(ChessBoard::Color::BLACK);
+    board.squares[4][0] = make_shared<ChessBoard::King>(ChessBoard::Color::WHITE);
+    board.squares[1][0] = make_shared<ChessBoard::Knight>(ChessBoard::Color::WHITE);
+    board.squares[6][0] = make_shared<ChessBoard::Knight>(ChessBoard::Color::WHITE);
+
+    board.squares[4][7] = make_shared<ChessBoard::King>(ChessBoard::Color::BLACK);
+    board.squares[1][7] = make_shared<ChessBoard::Knight>(ChessBoard::Color::BLACK);
+    board.squares[6][7] = make_shared<ChessBoard::Knight>(ChessBoard::Color::BLACK);
 
     cout << "Invalid moves:" << endl;
     board.move_piece("e3", "e2");
