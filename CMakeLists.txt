@@ -19,6 +19,7 @@ add_executable(Oving5 assignment5/chess.cpp)
 add_executable(chess6 assignment6/chess.cpp)
 add_executable(server6 assignment6/server.cpp)
 add_executable(7_a1 assignment7/part1.cpp)
+add_executable(7_a2 assignment7/part2.cpp)
 target_link_libraries(server6 ${Boost_LIBRARIES})
 
 INCLUDE(FindPkgConfig)
