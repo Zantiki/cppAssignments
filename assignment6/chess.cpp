@@ -112,7 +112,8 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
 
     /// 8x8 squares occupied by 1 or 0 chess pieces
     vector<vector<shared_ptr<Piece>>> squares;
-    function<void(const std::string, std::string, vector<vector<shared_ptr<Piece>>>)> on_move;
+    function<void(const std::string, const std::string, vector<vector<shared_ptr<ChessBoard::Piece>>>)> print_result;
+    function<void(vector<vector<shared_ptr<Piece>>>)> print_board;
 
     /// Move a chess piece if it is a valid move.
     /// Does not test for check or checkmate.
@@ -123,21 +124,25 @@ explicit Knight(ChessBoard::Color color) : Piece(color){}
         int to_y = stoi(string() + to[1]) - 1;
 
         auto &piece_from = squares[from_x][from_y];
-        on_move(from, to, squares);
+        print_result(from, to, this->squares);
         if (piece_from) {
             if (piece_from->valid_move(from_x, from_y, to_x, to_y)) {
                 auto &piece_to = squares[to_x][to_y];
                 if (piece_to) {
                     if (piece_from->color == piece_to->color)  {
+                        print_board(this->squares);
                         return false;
                     }
                 }
                 piece_to = move(piece_from);
+                print_board(this->squares);
                 return true;
             } else {
+                print_board(this->squares);
                 return false;
             }
         } else {
+            print_board(this->squares);
             return false;
         }
     }
@@ -151,7 +156,7 @@ public:
     ChessBoardPrint(ChessBoard *_board){
         this->board = _board;
 
-        function<void(vector<vector<shared_ptr<ChessBoard::Piece>>>)> print = []( auto squares ){
+        _board->print_board = []( auto squares ){
             string graphical_board = "\n---------------------------------";
             for(unsigned long y = 0; y < squares.size(); y++){
                 string y_str = "\n|";
@@ -171,8 +176,7 @@ public:
             cout << graphical_board << endl;
         };
 
-        function<void(const std::string, const std::string, vector<vector<shared_ptr<ChessBoard::Piece>>>)>
-                move_piece_graphics = [](const std::string &from, const std::string &to, auto squares ){
+        _board->print_result = [](const std::string &from, const std::string &to, auto squares ){
             int from_x = from[0] - 'a';
             int from_y = stoi(string() + from[1]) - 1;
             int to_x = to[0] - 'a';
@@ -204,10 +208,9 @@ public:
             }
             cout << "Should have printed" << endl;
         };
-       _board->on_move = [&print, &move_piece_graphics](const std::string &from, const std::string &to, auto squares ){
-           cout << "Called" << endl;
-           print(squares);
-           //move_piece_graphics(from, to, squares);
+
+        function<void()> test = [](){
+            cout << "test" << endl;
         };
 
 
@@ -217,11 +220,7 @@ public:
 
 int main() {
     ChessBoard board;
-
-    // Todo: segfault at function calls in on_move;
     ChessBoardPrint printer(&board);
-    //vector<vector<shared_ptr<ChessBoard::Piece>>> squares;
-    //board.on_move("e3", "e2", squares);
 
     board.squares[4][0] = make_shared<ChessBoard::King>(ChessBoard::Color::WHITE);
     board.squares[1][0] = make_shared<ChessBoard::Knight>(ChessBoard::Color::WHITE);
@@ -247,5 +246,6 @@ int main() {
     board.move_piece("d5", "f6");
     board.move_piece("h6", "g8");
     board.move_piece("f6", "e8");
+    return 0;
 
 }

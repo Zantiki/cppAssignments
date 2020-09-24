@@ -98,7 +98,6 @@ private:
             }
 
         });
-        //connection->socket.close();
     }
 
 public:
