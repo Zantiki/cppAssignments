@@ -78,6 +78,9 @@ int main(){
      * Fraction(3, 2) - 7 = method_call -(Fraction(3, 2), 7) =
      * method_call -(Fraction(3, 2), Fraction(7, 1)) = Fraction(-11, 2)
      * method_call -(Fraction(-11, 2), Fraction(4, 8)) = Fraction(-96, 16)
+     *
+     * If we use '-' ahead of the object that overloads, we will use the one implemented in the function or default to
+     * standard '-', i.e 1-1 (default '-'), obj-1 (object overloaded '-'), 1-obj (function overloaded '-')
      * */
     std::cout << final_fraction.numerator << "/" << final_fraction.denominator << std::endl;
 }
