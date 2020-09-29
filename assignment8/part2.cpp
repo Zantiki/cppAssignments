@@ -22,6 +22,13 @@ public:
         return this_sum > other_sum;
     }
 
+    bool operator<(Pair &other){
+        Type1 this_sum = this->first + this->second;
+        Type1 other_sum = other.first + other.second;
+
+        return this_sum < other_sum;
+    }
+
     Pair operator+(Pair &other){
         Type1 new_first = this->first + other.first;
         Type2 new_second = this->second + other.second;
