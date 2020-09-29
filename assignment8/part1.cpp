@@ -9,6 +9,13 @@ using namespace std;
 template<typename Type>
 
 bool equal(Type a, Type b) {
+    cout << "Calling template" << endl;
+    double diff = abs(a - b);
+    return diff < 0.00001;
+}
+
+bool equal(double a, double b) {
+    cout << "Calling special" << endl;
     double diff = abs(a - b);
     return diff < 0.00001;
 }
@@ -16,5 +23,9 @@ bool equal(Type a, Type b) {
 int main(){
     double a = 3.000001;
     double b = 3.001;
-    cout << equal(a, b)<< endl;
+    int a1 = 3;
+    int b1 = 3;
+
+    cout << "Equal special:\n"  << equal(a, b)<< endl;
+    cout << "Equal template:\n"  << equal(a1, b1)<< endl;
 }
