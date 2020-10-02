@@ -22,6 +22,7 @@ add_executable(7_a1 assignment7/part1.cpp)
 add_executable(7_a2 assignment7/part2.cpp)
 add_executable(8_a1 assignment8/part1.cpp)
 add_executable(8_a2 assignment8/part2.cpp)
+add_executable(a9 assignment9/a9.cpp)
 target_link_libraries(server6 ${Boost_LIBRARIES})
 
 INCLUDE(FindPkgConfig)
