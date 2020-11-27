@@ -90,3 +90,22 @@ but is not ideal if you wish to modify the string later on. Use
 * Refrences are in simple terms another name for a given variable, i.e
 names for an area in memory. As such they have to be initilized 
 with a pre-existing variable.
+
+## Function-objects
+Functions can be defined as lambda-expressions:
+```c++
+function<int(int, int)>product = [](int a, int b){
+    return a * b;
+};
+```
+
+These functions can be can be accessed by pointers,
+and as such you can use this to place outside code
+in a give object, like so:
+```c++
+class List { function<void()>sort }
+
+List list();
+list.sort = [](){};
+```
+
