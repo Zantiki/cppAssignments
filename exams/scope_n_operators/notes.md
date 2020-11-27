@@ -75,3 +75,56 @@ o = nullptr
 // Reassign object, will delete old one.
 o = unique_ptr<Object>(new Object)
 ```
+### Operator Overloading
+There are two types of operators:
+* binary: two operators
+* unary: one operator
+
+When defining object-specific operators:
+ ```c++
+// General definition,  used for + - \ *
+Object Object::operator+(const Object &other){
+    return Object(other.member + *this.member)
+}
+// Operators that do assignment
+// i.e +=, -= ++, --, *=, \=
+Object Object::&operator+=(const Object &other){
+    *this.member = other.member + *this.member
+    return *this
+}
+
+// Bool operators
+bool Object::operator==(const Object &other){
+    return other.member == *this.member
+}
+ ```
+when conducting arithmetic with operators the
+first line will be the same as calling the
+operator method as so:
+> object1 + object2 =
+> object1.plus(object2)
+
+Because of how the operators are implemented they
+can be chained together. This called being _associative_.
+
+For doing arithmetic with the first operand not being
+of the specified object type, the use the following:
+ ```c++
+// "this" is not invoked as first operand 
+// When function is not defined as member of Object.  
+Object operator+(int value1, const Object &object){
+    return Object(value1 + *object.member);
+}
+ ```
+We can also redefine operators for external classes
+by writing our own function.
+ ```c++
+ostream &operator<<(ostream &out, const Object &object){
+    out << object.member;
+    return out;
+}
+ ```
+
+operators ++ and -- are interpreted as binary when
+defining, but as unary when calling. -> will be 
+interpreted as unary if overloaded.
