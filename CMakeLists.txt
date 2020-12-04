@@ -27,6 +27,7 @@ add_executable(a9 assignment9/a9.cpp)
 add_executable(pf exams/pointers_n_functions/practice.cpp)
 add_executable(pf2 exams/scope_n_operators/practice.cpp)
 add_executable(exam19 exams/h19.cpp)
+add_executable(exam20 exams/v20.cpp)
 
 # target_link_libraries(server6 ${Boost_LIBRARIES})
 

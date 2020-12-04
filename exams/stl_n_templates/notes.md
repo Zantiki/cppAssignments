@@ -106,6 +106,11 @@ rotate(v1.begin(), v1.begin() + 3, v1.end());
 // of permutations.
 next_permutation(table.begin(), table.end());
 
+// Same as map:
+transform(table.begin(), table.end(), table.begin(), [](int e){
+    return e*2;
+});
+
 ```
 ## Algorithms for sorting data
 ```c++
