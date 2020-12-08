@@ -112,7 +112,7 @@ of the specified object type, the use the following:
  ```c++
 // "this" is not invoked as first operand 
 // When function is not defined as member of Object.  
-Object operator+(int value1, const Object &object){
+friend Object::operator+(int value1, const Object &object){
     return Object(value1 + *object.member);
 }
  ```

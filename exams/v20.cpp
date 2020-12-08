@@ -11,12 +11,12 @@
 
 using namespace std;
 
-string escape(char* text) {
+string escape(const string &text) {
+    // Use const on functions that don't modify
     string new_string;
 
     try {
-        char c = *text;
-        while (c) {
+        for(auto &c: text) {
             switch (c) {
                 case '<':
                     new_string += "&lt;";
@@ -32,8 +32,6 @@ string escape(char* text) {
                     break;
 
             }
-            text++;
-            c = *text;
         }
     }catch (const exception &e) {
         cout << "Text not stringy" << endl;
@@ -81,12 +79,13 @@ class Animal{
 public:
     Animal(string name_): name(name_){}
     string name;
-    string animal_type = "Animal";
+    string animal_type;
+
+    friend ostream &operator <<(ostream &stream, Animal &animal) {
+        stream << animal.animal_type << " named " << animal.name;
+    }
 };
 
-ostream &operator <<(ostream &stream, Animal &animal) {
-    stream << animal.animal_type << " named " << animal.name;
-}
 
 class Cat: public Animal{
 public:
@@ -109,15 +108,17 @@ void oppgave2(){
     animals.emplace_back(new Cat("Oreo"));
     animals.emplace_back(new Dog("Buddy"));
     animals.emplace_back(new Dog("Charlie"));
-//animals.emplace_back(new Animal()); // Should causecompilation error
-// animals.emplace_back(new Animal("Max")); // Should cause compilation error
+//animals.emplace_back(new Animal()); // Should cause compilation error
+    // does not cause errors:
+    // animals.emplace_back(new Animal("Max")); // Should cause compilation error
     for (auto &animal : animals)
         cout << *animal << endl;
 }
 
-/*void oppgave3(){
+void oppgave3(){
     map<long, long> results;
     vector<thread> threads;
+    // Right thought, wrong initialization
     shared_lock<mutex> mutex;
     // Mulig out-of-bounds ved preincrement
     for(long x = 43; x < 47; x++)
@@ -140,7 +141,7 @@ void oppgave2(){
         thread.join();
     for(auto &pair : results)
         cout << "f(" << pair.first << ") = " << pair.second << endl;
-}*/
+}
 
 class NorwegianKrone{
 public:
@@ -188,15 +189,15 @@ public:
         return this->amount * CurrencyType::to_euro(this->amount);
     }
 
-    Currency<CurrencyType> operator +(Currency<Euro> other){
+    /*Currency<CurrencyType> operator +(Currency<Euro> other){
         double euro_sum = other.get_euro_value() + this->get_euro_value();
         double new_amount = euro_sum;
         return Currency<CurrencyType>(new_amount);
-    }
-
-    Currency<CurrencyType> operator +(Currency<NorwegianKrone> other){
+    }*/
+    template <class CurrencyType2>
+    Currency<CurrencyType> operator +(Currency<CurrencyType2> other){
         double euro_sum = other.get_euro_value() + this->get_euro_value();
-        double new_amount = euro_sum * NorwegianKrone::get_exchange_rate();
+        double new_amount = euro_sum * CurrencyType2::get_exchange_rate();
         return Currency<CurrencyType>(new_amount);
     }
 };

@@ -28,6 +28,7 @@ void swap(int *a,  int &b){
 }
 
 void oppgave1(){
+    // riktig
     int a = 1, b = 2;
     swap(a, b);
     std::cout << a << ' ' << b << std::endl;
@@ -45,24 +46,25 @@ public:
 
     class Hot{
     public:
-        string to_string(){
+        static string to_string(){
             return "hot";
         }
     };
 
     class Cold{
     public:
-       string to_string(){
+       static string to_string(){
             return "cold";
         }
     };
 
+    // Should be overloaded ostream
     string operator +(){
-        return Hot().to_string();
+        return Hot::to_string();
     }
 
     string operator -(){
-        return Cold().to_string();
+        return Cold::to_string();
     }
 };
 
@@ -75,6 +77,7 @@ ostream &operator <<(ostream &stream, Degrees::Cold temp){
 };*/
 
 void oppgave2(){
+    // Avoid to-strings
     Degrees degrees;
     cout << +degrees << endl;
     cout << -degrees << endl;
@@ -91,8 +94,12 @@ void oppgave3() {
     unique_ptr<int> a = make_unique<int>(2);
     unique_ptr<int> b = make_unique<int>(2);
 
-    // b tas in som kopi av peker.
+    // b refrerer til unique pointer
 
+    // Retting: b burde vært flyttet med std::move(b),
+    // a kunne vært pass by value, fjerning av
+    // brackets har samme effekt men er mindre illustrerende
+    // Endre helle ikke på output inne i thread.
     a_thread = new std::thread([&a, &b] {
         std::cout << (*a + *b) << std::endl;
     });
@@ -116,7 +123,7 @@ public:
 class Car{
 public:
     string descriptor;
-
+    // should be friend-function
     ostream &operator<< (ostream &stream){
         stream << this->to_string();
         return stream;
@@ -143,6 +150,7 @@ public:
     }
 };
 
+// Redefine as friend in class.
 ostream &operator<< (ostream &stream, Car &car){
     stream << car.to_string();
     return stream;
@@ -177,6 +185,7 @@ void oppgave5(){
     vector<int> v3 = {1, 2};
     vector<int> v4 = {3, 4};
     v3.insert(v3.end(), v4.begin(), v4.begin() + 1);
+
     for (auto e : v3)
         cout << e << endl;
     cout << "\n" << endl;

@@ -77,7 +77,8 @@ C++ uses two different types of argument-transfer.
 in the case of arrays address-transfer.
 * Referense-transfer: A function is working with 
 predefined variables outside its scope. Commonly used when
-input/output are the same variables. Here refrences must be const,
+input/output are the same variables. Here refrences are const if the
+  variable is not modified,
 for the sake of referring to the same variable the entire way.
 ### Pitfalls
 * Pointers are interpreted as raw addresses and such it can

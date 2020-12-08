@@ -38,7 +38,7 @@ Example of a standard class:
 class Object{
 public:
     Object(const string &immutable_, int mutable_);
-    const get_immutable() const;
+    const int get_immutable() const;
     int get_mutable() const;
     
 private:
@@ -48,7 +48,7 @@ private:
 
 Object::Object(const string &immutable_, int mutable_) : immutable(immutable_), mutable(mutable){}
 
-const Object::get_immutable() const {
+const int Object::get_immutable() const {
     return immutable;
 }
 
@@ -76,7 +76,7 @@ public:
     string id;
     General(const string &id): id(id_){}
     
-    // Super has virtual
+    // Super has virtual, on beginning
     virtual void print() const{
         cout << "General" << endl;
     }
@@ -86,8 +86,8 @@ class Special{
 public:
     string special_id;
     Special(const string &general_id, const string &special_id) : General(general_id), special_id(special_id){}
-    
-    void print() const override(){
+    // subclass has override on end
+    void print() const override{
         General::print()
         cout << "NOT!!!" << endl;
     }
